@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Carbono</title>
+
+  <!-- Tipografía: Sora (si no hay internet se usa la fuente del sistema) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@200;300;400;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <main>
+    <section class="calc" id="calc" data-modo="basica" aria-label="Calculadora">
+
+      <!-- Barra superior: selector de modo e historial -->
+      <header class="barra">
+        <div class="modos" role="group" aria-label="Modo de la calculadora">
+          <button type="button" class="modo" data-modo="basica" aria-pressed="true">Básica</button>
+          <button type="button" class="modo" data-modo="cientifica" aria-pressed="false">Científica</button>
+        </div>
+        <button type="button" class="icono" id="btn-historial" aria-label="Abrir historial" aria-expanded="false">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7"/>
+            <path d="M3 4v5h5"/>
+            <path d="M12 7.5V12l3 2"/>
+          </svg>
+        </button>
+      </header>
+
+      <!-- Pantalla -->
+      <div class="visor">
+        <div class="previa" id="previa"></div>
+        <div class="pantalla" id="pantalla" aria-live="polite" title="Clic para copiar el resultado">0</div>
+      </div>
+
+      <!-- Teclas científicas (se despliegan en modo científico) -->
+      <div class="cientifica" id="cientifica" inert>
+        <div class="teclas teclas--sci">
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="sin">sin</button>
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="cos">cos</button>
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="tan">tan</button>
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="log">log</button>
+
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="ln">ln</button>
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="√" aria-label="Raíz cuadrada">√</button>
+          <button type="button" class="tecla tecla--sci" data-accion="sufijo" data-valor="^2" aria-label="Al cuadrado"><span>x<sup>2</sup></span></button>
+          <button type="button" class="tecla tecla--sci" data-accion="operador" data-valor="^" aria-label="Potencia"><span>x<sup>y</sup></span></button>
+
+          <button type="button" class="tecla tecla--sci" data-accion="constante" data-valor="π">π</button>
+          <button type="button" class="tecla tecla--sci" data-accion="constante" data-valor="e">e</button>
+          <button type="button" class="tecla tecla--sci" data-accion="parentesis" data-valor="(" aria-label="Abrir paréntesis">(</button>
+          <button type="button" class="tecla tecla--sci" data-accion="parentesis" data-valor=")" aria-label="Cerrar paréntesis">)</button>
+
+          <button type="button" class="tecla tecla--sci" data-accion="sufijo" data-valor="!" aria-label="Factorial">x!</button>
+          <button type="button" class="tecla tecla--sci" data-accion="sufijo" data-valor="^(−1)" aria-label="Inverso"><span>x<sup>−1</sup></span></button>
+          <button type="button" class="tecla tecla--sci" data-accion="funcion" data-valor="abs" aria-label="Valor absoluto">abs</button>
+          <button type="button" class="tecla tecla--sci" data-accion="angulo" id="btn-angulo" aria-label="Cambiar entre grados y radianes">DEG</button>
+        </div>
+      </div>
+
+      <!-- Teclado principal -->
+      <div class="teclas">
+        <button type="button" class="tecla tecla--fn tecla--limpiar" data-accion="limpiar" aria-label="Borrar todo">AC</button>
+        <button type="button" class="tecla tecla--fn" data-accion="borrar" aria-label="Borrar último carácter">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 7a2 2 0 0 0-2-2H9l-6 7 6 7h10a2 2 0 0 0 2-2z"/>
+            <path d="m12.5 9.5 5 5m0-5-5 5"/>
+          </svg>
+        </button>
+        <button type="button" class="tecla tecla--fn" data-accion="sufijo" data-valor="%" aria-label="Porcentaje">%</button>
+        <button type="button" class="tecla tecla--op" data-accion="operador" data-valor="÷" aria-label="Dividir">÷</button>
+
+        <button type="button" class="tecla" data-accion="digito" data-valor="7">7</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="8">8</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="9">9</button>
+        <button type="button" class="tecla tecla--op" data-accion="operador" data-valor="×" aria-label="Multiplicar">×</button>
+
+        <button type="button" class="tecla" data-accion="digito" data-valor="4">4</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="5">5</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="6">6</button>
+        <button type="button" class="tecla tecla--op" data-accion="operador" data-valor="−" aria-label="Restar">−</button>
+
+        <button type="button" class="tecla" data-accion="digito" data-valor="1">1</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="2">2</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="3">3</button>
+        <button type="button" class="tecla tecla--op" data-accion="operador" data-valor="+" aria-label="Sumar">+</button>
+
+        <button type="button" class="tecla tecla--fn" data-accion="signo" aria-label="Cambiar signo">±</button>
+        <button type="button" class="tecla" data-accion="digito" data-valor="0">0</button>
+        <button type="button" class="tecla" data-accion="punto" aria-label="Punto decimal">.</button>
+        <button type="button" class="tecla tecla--igual" data-accion="igual" aria-label="Calcular">=</button>
+      </div>
+
+      <!-- Panel del historial -->
+      <aside class="historial" id="historial" aria-label="Historial de operaciones" inert>
+        <div class="historial__cabecera">
+          <h2>Historial</h2>
+          <button type="button" class="texto-btn" id="btn-borrar-historial">Borrar</button>
+          <button type="button" class="icono" id="btn-cerrar-historial" aria-label="Cerrar historial">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6 6 18"/>
+            </svg>
+          </button>
+        </div>
+        <ul class="historial__lista" id="lista-historial"></ul>
+        <p class="historial__vacio" id="historial-vacio">Todavía no hay operaciones.</p>
+      </aside>
+
+    </section>
+  </main>
+
+  <div class="aviso" id="aviso" role="status"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>

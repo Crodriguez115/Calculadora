@@ -1,0 +1,473 @@
+/* ==========================================================
+   Calculadora Carbono
+   Paleta: acero oscuro + bronce
+   ========================================================== */
+
+:root {
+  /* Fondo de la página */
+  --fondo-1: #0e141b;
+  --fondo-2: #1b2632;
+
+  /* Cuerpo y pantalla */
+  --visor: #091017;
+  --linea: #3a4858;
+
+  /* Texto */
+  --texto: #e8ecf0;
+  --texto-suave: #8794a2;
+
+  /* Bronce (acento principal) */
+  --bronce-claro: #e2b98a;
+  --bronce: #b07a45;
+  --bronce-oscuro: #6e4521;
+
+  /* Error */
+  --error: #e5887a;
+
+  --fuente: 'Sora', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  font-family: var(--fuente);
+  color: var(--texto);
+  background-color: var(--fondo-1);
+  background-image:
+    radial-gradient(900px 600px at 50% -10%, #263648 0%, transparent 65%),
+    linear-gradient(180deg, var(--fondo-1), var(--fondo-2));
+  background-attachment: fixed;
+}
+
+button {
+  font-family: inherit;
+}
+
+main {
+  width: min(100%, 380px);
+}
+
+/* ---------- Cuerpo de la calculadora ---------- */
+
+.calc {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  padding: 18px;
+  border-radius: 30px;
+  border: 1px solid var(--linea);
+  /* textura fina de metal cepillado + degradado del marco */
+  background:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.02) 0 1px, transparent 1px 3px),
+    linear-gradient(150deg, #2d3946 0%, #18202a 55%, #141b23 100%);
+  box-shadow:
+    0 40px 80px -20px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ---------- Barra superior ---------- */
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.modos {
+  display: flex;
+  padding: 3px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.28);
+}
+
+.modo {
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 0.78rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.modo:hover {
+  color: var(--texto);
+}
+
+.modo[aria-pressed="true"] {
+  background: #33404d;
+  color: var(--bronce-claro);
+}
+
+.icono {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--texto-suave);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.icono:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--bronce-claro);
+}
+
+/* ---------- Pantalla ---------- */
+
+.visor {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 132px;
+  margin-bottom: 16px;
+  padding: 14px 18px 16px;
+  border-radius: 18px;
+  background: var(--visor);
+  box-shadow:
+    inset 0 2px 8px rgba(0, 0, 0, 0.7),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03);
+}
+
+/* línea de bronce que marca el borde inferior de la pantalla */
+.visor::after {
+  content: "";
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bronce), transparent);
+  opacity: 0.8;
+}
+
+.previa {
+  min-height: 1.5em;
+  margin-bottom: 4px;
+  text-align: right;
+  font-size: 0.95rem;
+  font-weight: 300;
+  color: var(--texto-suave);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pantalla {
+  text-align: right;
+  font-size: 3.2rem;
+  font-weight: 200;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+  cursor: default;
+  transition: font-size 0.15s;
+}
+
+.pantalla::-webkit-scrollbar {
+  display: none;
+}
+
+.pantalla[data-tam="m"]  { font-size: 2.5rem; }
+.pantalla[data-tam="s"]  { font-size: 2rem; }
+.pantalla[data-tam="xs"] { font-size: 1.5rem; }
+
+.pantalla.es-error {
+  white-space: normal;
+  font-size: 1.2rem;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0;
+  color: var(--error);
+}
+
+/* ---------- Teclas ---------- */
+
+.teclas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.tecla {
+  height: 60px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 15px;
+  background: linear-gradient(180deg, #2a3541, #212b36);
+  color: var(--texto);
+  font-size: 1.2rem;
+  font-weight: 400;
+  cursor: pointer;
+  box-shadow:
+    0 3px 0 #0e1319,
+    0 6px 10px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  transition: transform 0.08s, box-shadow 0.08s, filter 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tecla:hover {
+  filter: brightness(1.14);
+}
+
+/* .activa se usa cuando la tecla se pulsa desde el teclado físico */
+.tecla:active,
+.tecla.activa {
+  transform: translateY(2px);
+  box-shadow:
+    0 1px 0 #0e1319,
+    0 2px 4px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.tecla--fn {
+  background: linear-gradient(180deg, #37434f, #2b3641);
+  color: #cfd7df;
+  font-size: 1.05rem;
+}
+
+.tecla--limpiar {
+  color: var(--error);
+}
+
+.tecla--op {
+  background: linear-gradient(180deg, #303b47, #252f3a);
+  color: var(--bronce-claro);
+  font-size: 1.5rem;
+}
+
+.tecla--igual {
+  background: linear-gradient(180deg, var(--bronce-claro), var(--bronce));
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #22160a;
+  font-size: 1.5rem;
+  font-weight: 600;
+  box-shadow:
+    0 3px 0 var(--bronce-oscuro),
+    0 8px 18px rgba(176, 122, 69, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.tecla sup {
+  font-size: 0.65em;
+  line-height: 0;
+}
+
+/* ---------- Panel científico ---------- */
+
+.cientifica {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease, margin 0.3s ease;
+}
+
+.cientifica > .teclas {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.calc[data-modo="cientifica"] .cientifica {
+  grid-template-rows: 1fr;
+  margin-bottom: 12px;
+}
+
+.teclas--sci {
+  gap: 8px;
+}
+
+.tecla--sci {
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #232d38, #1b242e);
+  color: #aebbc8;
+  font-size: 0.88rem;
+  box-shadow:
+    0 2px 0 #0b1015,
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- Historial ---------- */
+
+.historial {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  background: #0f151c;
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+}
+
+.historial.abierto {
+  transform: translateX(0);
+}
+
+.historial__cabecera {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.historial__cabecera h2 {
+  margin: 0 auto 0 4px;
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--bronce-claro);
+}
+
+.texto-btn {
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.texto-btn:hover {
+  color: var(--error);
+}
+
+.historial__lista {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a4858 transparent;
+}
+
+.historial__item {
+  display: block;
+  width: 100%;
+  padding: 12px 8px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: transparent;
+  color: inherit;
+  text-align: right;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.historial__item:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.historial__expr {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 300;
+  color: var(--texto-suave);
+  overflow-wrap: anywhere;
+}
+
+.historial__res {
+  display: block;
+  margin-top: 2px;
+  font-size: 1.4rem;
+  font-weight: 300;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.historial__vacio {
+  margin: auto;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.historial__vacio[hidden] {
+  display: none;
+}
+
+/* ---------- Aviso (copiado) ---------- */
+
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  padding: 10px 18px;
+  border-radius: 999px;
+  background: #2b3743;
+  border: 1px solid var(--linea);
+  color: var(--texto);
+  font-size: 0.85rem;
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+}
+
+.aviso.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+/* ---------- Accesibilidad y adaptación ---------- */
+
+:focus-visible {
+  outline: 2px solid var(--bronce-claro);
+  outline-offset: 2px;
+}
+
+@media (max-width: 400px) {
+  .calc {
+    padding: 14px;
+    border-radius: 24px;
+  }
+
+  .teclas {
+    gap: 8px;
+  }
+
+  .tecla {
+    height: 54px;
+  }
+
+  .tecla--sci {
+    height: 42px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+  }
+}
